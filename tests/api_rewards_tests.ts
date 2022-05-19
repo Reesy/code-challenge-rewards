@@ -27,6 +27,7 @@ describe(`When I call the rewards API`, () =>
             userId = 1;
             at = "2020-03-19T12:00:00Z"
             api = `/api/users/${userId}/rewards`;
+    
         });
 
         it("Should return a 200 response", async () =>
