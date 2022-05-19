@@ -5,17 +5,20 @@ const app: express.Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get('/api/v1/test1', (req: express.Request, res: express.Response) =>
+app.get('/api/users/:userId/rewards', (req: express.Request, res: express.Response) =>
 {
-  res.json({ message: 'Hello World!' });
-});
-
-app.post('/api/v1/test1', (req: express.Request, res: express.Response) =>
-{
-  let body: any = req.body;
-  let responseMessage = `The body was: ${body.message}!`;
+  let userId: string = req.params.userId;
+  let at: any = req.query.at;
+  let responseMessage = `The userId was: ${userId} and the at was: ${at}!`;
   res.json(responseMessage);
 });
 
+app.patch('/api/users/:userId/rewards', (req: express.Request, res: express.Response) =>
+{
+  let userId: string = req.params.userId;
+  let at: any = req.query.at;
+  let responseMessage = `The userId was: ${userId} and the at was: ${at}!`;
+  res.json(responseMessage);
+});
 
 export { app };
