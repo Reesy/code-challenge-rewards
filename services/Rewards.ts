@@ -44,34 +44,62 @@ export default class Rewards
     };
 
 
-    public redeemReward(userId: string, rewardId: string): Promise<Reward>
+    public async redeemReward(userId: string, rewardId: string): Promise<Reward>
     {
-        return new Promise<Reward>((resolve, reject) =>
+        try
         {
-            try
-            {
-                this.validateUserId(userId);
-                this.validateRewardId(rewardId);
-            } catch (error)
-            {
-                reject(error);
-            };
+            this.validateUserId(userId);
+            this.validateRewardId(rewardId);
+        } catch (error)
+        {
+            throw error;
+        };
 
-            this._database.setRedeemed(userId, rewardId)
-                .then((reward: Reward) =>
-                {
-                    resolve(reward);
-                }
-                ).catch((error: Error) =>
-                {
-                    reject(error);
-                }
-                );
+        let user = await this._database.getUser(userId);
 
-        });
+        if (typeof(user) === "undefined")
+        {
+            throw new Error("User not found");
+        };
+
+        let rewards: Reward[] = await this._database.getWeeksRewards(userId, this.getWeekStart(rewardId));
+
+        if (rewards.length === 0)
+        {
+            throw new Error ("No rewards found");
+        };
+
+        let dayOfWeek = new Date(rewardId).getDay();
+
+        let reward = rewards[dayOfWeek];
+
+        if (typeof(reward) === "undefined")
+        {
+            throw new Error ("Reward not found");
+        };
+
+
+        if (reward.redeemedAt !== null)
+        {
+            return reward;
+        };
+
+        
+        if (reward.expiresAt < new Date().toISOString())
+        {
+            throw new Error ("This reward is already expired");
+        }
+
+        reward.redeemedAt = new Date().toISOString();
+
+        await this._database.updateRewards(userId, rewards);
+
+        return reward;
 
     };
 
+
+    // I feel this could be refactored heavily, it's muddling concerns abit. 
     private generateRewards(at: string): Reward[]
     {
         let targetDate: any = new Date(at);
@@ -108,7 +136,6 @@ export default class Rewards
 
         };
 
-        // Strip off a zero from the end 
         return rewards;
     };
 
@@ -145,7 +172,7 @@ export default class Rewards
 
     private validateRewardId(rewardId: string): void
     {
-        if (isNaN(Number(rewardId)))
+        if (isNaN(Date.parse(rewardId)))
         {
             throw new Error("The rewardId must be a valid date string.");
         }

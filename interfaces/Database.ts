@@ -6,6 +6,6 @@ export default interface Database
     getUser(userId: string): Promise<User>;
     getWeeksRewards(userId: string, priorSunday: string): Promise<Reward[]>;
     addRewards(userId: string, rewards: Reward[]): Promise<void>
-    setRedeemed(userId: string, at: string): Promise<Reward>;
+    updateRewards(userId: string, rewards: Reward[]): Promise<void>
     addUser(userId: string): Promise<void>
 };

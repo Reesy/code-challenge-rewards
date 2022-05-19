@@ -41,7 +41,7 @@ app.get('/users/:userId/rewards', async (req: express.Request, res: express.Resp
   catch (error: any)
   {
     //Normally I would pass this to a handler class to decide the appropriate error code and response. 
-    // console.log('The error was: ', error);
+
     res.status(400).send(error.message);
   }
 });
@@ -56,13 +56,20 @@ app.patch('/users/:userId/rewards/:rewardId/redeem', async (req: express.Request
     let response: PatchRewardsResponse = {
       data: redeemedReward
     };
+
+    res.json(response);
   }
   catch (error: any)
   { 
+    //Not a fan of this, would prefer error codes and a handler but maybe thats overkill for this example.
+    if (error.message === "This reward is already expired")
+    {
+      res.status(405).send({ error: { message: error.message }});
+      return;
+    };
     res.status(400).send(error.message);
   };
-  let responseMessage = `The userId was: ${userId} and the rewardId was: ${rewardId}!`;
-  res.json(responseMessage);
+ 
 });
 
 export { app };
