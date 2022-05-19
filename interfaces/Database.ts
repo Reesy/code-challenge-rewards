@@ -5,5 +5,5 @@ export default interface Database
 {
     getUser(userId: string): Promise<User>;
     getRewards(userId: string, at: string): Promise<Reward[]>;
-    setRedeemed(userId: string, at: string): Promise<void>;
+    setRedeemed(userId: string, at: string): Promise<Reward>;
 };

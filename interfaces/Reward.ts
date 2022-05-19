@@ -2,6 +2,6 @@
 export default interface Reward
 {
     availableAt: String;
-    redeemedAt: Date | null;
+    redeemedAt: String | null;
     expiresAt: String;
 }

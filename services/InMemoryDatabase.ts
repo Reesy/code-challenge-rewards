@@ -23,8 +23,14 @@ export default class InMemoryDatabase implements Database
     {
         return;
     }
-    public async setRedeemed(userId: string, at: string): Promise<void>
+    public async setRedeemed(userId: string, at: string): Promise<Reward>
     {
+        let reward : Reward = {
+            availableAt: "",
+            redeemedAt: null,
+            expiresAt: ""
+        };
+        return reward;
         // throw new Error("Method not implemented.");
     }
 

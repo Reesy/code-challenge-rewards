@@ -25,7 +25,7 @@ export default class Rewards
 
             this._database.getRewards(userId, at)
                 .then((rewards: Reward[]) =>
-                {   
+                {
                     if (rewards.length === 0)
                     {
                         rewards = this.generateRewards(at);
@@ -38,13 +38,42 @@ export default class Rewards
         });
     };
 
+
+    public redeemReward(userId: string, rewardId: string): Promise<Reward>
+    {
+        return new Promise<Reward>((resolve, reject) =>
+        {
+            try
+            {
+                this.validateUserId(userId);
+                this.validateRewardId(rewardId);
+            } catch (error)
+            {
+                reject(error);
+            };
+
+            this._database.setRedeemed(userId, rewardId)
+                .then((reward: Reward) =>
+                {
+                    resolve(reward);
+                }
+                ).catch((error: Error) =>
+                {
+                    reject(error);
+                }
+                );
+
+        });
+
+    };
+
     private generateRewards(at: string): Reward[]
     {
         const dayInMilliseconds = 86400000;
-        let targetDate : any = new Date(at);
+        let targetDate: any = new Date(at);
         let day = targetDate.getDay();
-        let elapsedDaysSinceSunday : number = dayInMilliseconds * day 
-        let priorSundayInMilliseconds: number  = targetDate - elapsedDaysSinceSunday;
+        let elapsedDaysSinceSunday: number = dayInMilliseconds * day
+        let priorSundayInMilliseconds: number = targetDate - elapsedDaysSinceSunday;
 
         let rewards: Reward[] = [];
         for (let weekday = 0; weekday <= 6; weekday++)
@@ -56,7 +85,7 @@ export default class Rewards
 
             // Throw away the miliseconds component 
             // I would push back on the requirements here, It's probably cleaner to keep the miliseconds component and not worry about errors from string manipulation. 
-            let availableAtString = availableAt.toISOString().split(".")[0]+"Z";
+            let availableAtString = availableAt.toISOString().split(".")[0] + "Z";
 
 
             let expiresAtInMilliseconds = availableAtInMilliseconds + dayInMilliseconds;
@@ -64,7 +93,7 @@ export default class Rewards
             expiresAt.setHours(0, 0, 0);
 
 
-            let expiresAtString = expiresAt.toISOString().split(".")[0]+"Z";
+            let expiresAtString = expiresAt.toISOString().split(".")[0] + "Z";
             let reward: Reward = {
                 availableAt: availableAtString,
                 redeemedAt: null,
@@ -72,11 +101,11 @@ export default class Rewards
             };
 
             rewards.push(reward);
-        
+
         };
 
         // Strip off a zero from the end 
-        return rewards;        
+        return rewards;
     };
 
     private validateUserId(userId: string): void
@@ -95,6 +124,14 @@ export default class Rewards
             throw new Error("The 'at' query parameter must be a valid date.");
         }
         return;
+    };
+
+    private validateRewardId(rewardId: string): void
+    {
+        if (isNaN(Number(rewardId)))
+        {
+            throw new Error("The rewardId must be a valid date string.");
+        }
     };
 
 }

@@ -57,7 +57,7 @@ describe('When I call the PATCH rewards API', () =>
     {
 
 
-        describe('And the GET rewwards API has yet to be called for the user', () =>
+        describe('And the GET rewards API has yet to be called for the user', () =>
         {
             it('Should return a 404', async () =>
             {
