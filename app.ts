@@ -19,9 +19,19 @@ app.get('/api/users/:userId/rewards', async (req: express.Request, res: express.
 {
   let userId: string = req.params.userId;
   let at: any = req.query.at;
+
   //Validation is done in the rewards service.
-  let userRewards: Reward[] = await rewards.getRewards(userId, at);
-  res.json(userRewards);
+  try
+  {
+    let userRewards: Reward[] = await rewards.getRewards(userId, at);
+    res.json(userRewards);
+  } 
+  catch (error: any)
+  {
+    //Normally I would pass this to a handler class to decide the appropriate error code and response. 
+    // console.log('The error was: ', error);
+    res.status(400).send(error.message);
+  }
 });
 
 app.patch('/api/users/:userId/rewards', (req: express.Request, res: express.Response) =>

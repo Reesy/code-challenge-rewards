@@ -27,7 +27,7 @@ describe(`When I call the rewards API`, () =>
             userId = 1;
             at = "2020-03-19T12:00:00Z"
             api = `/api/users/${userId}/rewards`;
-    
+
         });
 
         it("Should return a 200 response", async () =>
@@ -35,10 +35,6 @@ describe(`When I call the rewards API`, () =>
             const response = await request(app)
                 .get(api)
                 .query({ at });
-
-            console.log('request: ', api);
-            console.log('response: ', response.body);
-
             expect(response.status).to.eql(200);
         });
 
@@ -79,6 +75,7 @@ describe(`When I call the rewards API`, () =>
     // The behaviour here wasn't given in the spec, in a real scenario I would clarify the requirements first. 
     // I would also wrap the error logic in an error code known internally only. 
     // I can't imagine a scenario where the user needs to know the true reason for an error. (might also be insecure)
+    // but for this I'll just return the error status as a string.
     describe("And I send an invalid request", () =>
     {
         describe('Where the userId is not a number', () =>
@@ -91,20 +88,13 @@ describe(`When I call the rewards API`, () =>
                 expect(response.status).to.eql(400);
             });
 
-            it("Should return a body with a 'message' object", async () =>
+            let expectedErrorMessage = "The userId must be a number.";
+            it(`Should have an error message "${expectedErrorMessage}"`, async () =>
             {
                 const response = await request(app)
                     .get("/api/users/abc/rewards");
 
-                expect(response.body).to.have.property('message');
-            });
-
-            it("Should have a 'message' object containing the error message", async () =>
-            {
-                const response = await request(app)
-                    .get("/api/users/abc/rewards");
-
-                expect(response.body.message).to.eql("The userId must be a number.");
+                expect(response.text).to.eql(expectedErrorMessage);
             });
         });
 
@@ -118,23 +108,14 @@ describe(`When I call the rewards API`, () =>
 
                 expect(response.status).to.eql(400);
             });
-
-            it("Should return a body with a 'message' object", async () =>
+            let expectedErrorMessage = "The 'at' query parameter must be a valid date.";
+            it(`Should have an error message "${expectedErrorMessage}"`, async () =>
             {
                 const response = await request(app)
                     .get("/api/users/1/rewards")
                     .query({ at: "abc" });
 
-                expect(response.body).to.have.property('message');
-            });
-
-            it("Should have a 'message' object containing the error message", async () =>
-            {
-                const response = await request(app)
-                    .get("/api/users/1/rewards")
-                    .query({ at: "abc" });
-
-                expect(response.body.message).to.eql("The at must be a valid date.");
+                expect(response.text).to.eql(expectedErrorMessage);
             });
         });
 
