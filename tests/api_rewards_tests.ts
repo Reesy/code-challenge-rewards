@@ -8,13 +8,13 @@ describe("When I call an unknown or incorrectly typed endpoint", () =>
 {
     it("should return a 404", async () =>
     {
-        const response = await request(app).get("/api/uusers/1/rewards");
+        const response = await request(app).get("/uusers/1/rewards");
         expect(response.status).to.equal(404);
     });
 });
 
 // Represents the happy/green path. 
-describe(`When I call the rewards API`, () => 
+describe(`When I call the GET rewards API`, () => 
 {
     describe("And I send a valid request", () =>
     {
@@ -26,7 +26,7 @@ describe(`When I call the rewards API`, () =>
         {
             userId = 1;
             at = "2020-03-19T12:00:00Z"
-            api = `/api/users/${userId}/rewards`;
+            api = `/users/${userId}/rewards`;
 
         });
 
@@ -83,7 +83,7 @@ describe(`When I call the rewards API`, () =>
             it("Should return a 400 response", async () =>
             {
                 const response = await request(app)
-                    .get("/api/users/abc/rewards");
+                    .get("/users/abc/rewards");
 
                 expect(response.status).to.eql(400);
             });
@@ -92,7 +92,7 @@ describe(`When I call the rewards API`, () =>
             it(`Should have an error message "${expectedErrorMessage}"`, async () =>
             {
                 const response = await request(app)
-                    .get("/api/users/abc/rewards");
+                    .get("/users/abc/rewards");
 
                 expect(response.text).to.eql(expectedErrorMessage);
             });
@@ -103,7 +103,7 @@ describe(`When I call the rewards API`, () =>
             it("Should return a 400 response", async () =>
             {
                 const response = await request(app)
-                    .get("/api/users/1/rewards")
+                    .get("/users/1/rewards")
                     .query({ at: "abc" });
 
                 expect(response.status).to.eql(400);
@@ -112,7 +112,7 @@ describe(`When I call the rewards API`, () =>
             it(`Should have an error message "${expectedErrorMessage}"`, async () =>
             {
                 const response = await request(app)
-                    .get("/api/users/1/rewards")
+                    .get("/users/1/rewards")
                     .query({ at: "abc" });
 
                 expect(response.text).to.eql(expectedErrorMessage);

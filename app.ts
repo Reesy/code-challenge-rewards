@@ -19,7 +19,7 @@ interface GetRewardsResponse
 let database: Database = new InMemoryDatabase();
 let rewards = new Rewards(database);
 
-app.get('/api/users/:userId/rewards', async (req: express.Request, res: express.Response) =>
+app.get('/users/:userId/rewards', async (req: express.Request, res: express.Response) =>
 {
   let userId: string = req.params.userId;
   let at: any = req.query.at;
@@ -41,11 +41,11 @@ app.get('/api/users/:userId/rewards', async (req: express.Request, res: express.
   }
 });
 
-app.patch('/api/users/:userId/rewards', (req: express.Request, res: express.Response) =>
+app.patch('/users/:userId/rewards/:rewardId/redeem', (req: express.Request, res: express.Response) =>
 {
   let userId: string = req.params.userId;
-  let at: any = req.query.at;
-  let responseMessage = `The userId was: ${userId} and the at was: ${at}!`;
+  let rewardId: string = req.params.rewardId;
+  let responseMessage = `The userId was: ${userId} and the rewardId was: ${rewardId}!`;
   res.json(responseMessage);
 });
 

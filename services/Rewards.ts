@@ -44,13 +44,7 @@ export default class Rewards
         let targetDate : any = new Date(at);
         let day = targetDate.getDay();
         let elapsedDaysSinceSunday : number = dayInMilliseconds * day 
-
         let priorSundayInMilliseconds: number  = targetDate - elapsedDaysSinceSunday;
-        let priorSunday = new Date(priorSundayInMilliseconds);
-
-        // strip hours off date
-        priorSunday.setHours(0, 0, 0);
-
 
         let rewards: Reward[] = [];
         for (let weekday = 0; weekday <= 6; weekday++)
