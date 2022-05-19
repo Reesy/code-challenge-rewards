@@ -18,6 +18,11 @@ export default class InMemoryDatabase implements Database
         let rewards : Reward[] = [];
         return rewards;
     }
+
+    public async addReward(userId: string, reward: Reward[]): Promise<void>
+    {
+        return;
+    }
     public async setRedeemed(userId: string, at: string): Promise<void>
     {
         // throw new Error("Method not implemented.");

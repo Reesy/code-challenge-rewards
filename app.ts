@@ -9,6 +9,10 @@ const app: express.Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+interface GetRewardsResponse
+{
+  data : Reward[]
+}
 
 // I've typed towards an interface here so that in future this could be swapped to a different database without having to make many changes.
 // As long as any new databases adhere to the database interface it should be relatively easy to swap out.
@@ -24,7 +28,10 @@ app.get('/api/users/:userId/rewards', async (req: express.Request, res: express.
   try
   {
     let userRewards: Reward[] = await rewards.getRewards(userId, at);
-    res.json(userRewards);
+    let response: GetRewardsResponse = {
+      data: userRewards
+    };
+    res.json(response);
   } 
   catch (error: any)
   {
