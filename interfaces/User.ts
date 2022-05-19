@@ -1,8 +1,8 @@
-import Reward from "./Reward";
-
+import WeeklyRewards from "./WeeklyRewards";
 
 export default interface User 
 {
     id: string;
-    rewards: Reward[];
+    weeklyRewards: WeeklyRewards[];
 }
+

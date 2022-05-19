@@ -1,8 +1,11 @@
 import Database from "../interfaces/Database";
 import Reward from "../interfaces/Reward";
 
+const dayInMilliseconds = 86400000;
+
 export default class Rewards 
 {
+
     private _database: Database;
 
     constructor(database: Database) 
@@ -10,32 +13,34 @@ export default class Rewards
         this._database = database;
     }
 
-    public getRewards(userId: string, at: string): Promise<Reward[]>
+    public async getRewards(userId: string, at: string): Promise<Reward[]>
     {
-        return new Promise<Reward[]>((resolve, reject) =>
+        try
         {
-            try
-            {
-                this.validateUserId(userId);
-                this.validateAt(at);
-            } catch (error)
-            {
-                reject(error);
-            };
+            this.validateUserId(userId);
+            this.validateAt(at);
+        } catch (error)
+        {
+            throw error;
+        };
 
-            this._database.getRewards(userId, at)
-                .then((rewards: Reward[]) =>
-                {
-                    if (rewards.length === 0)
-                    {
-                        rewards = this.generateRewards(at);
-                    };
-                    resolve(rewards);
-                }).catch((error: Error) =>
-                {
-                    reject(error);
-                });
-        });
+        let user = await this._database.getUser(userId);
+
+        if (typeof(user) === "undefined")
+        {
+           await this._database.addUser(userId);
+        }
+
+        let rewards = await this._database.getWeeksRewards(userId, this.getWeekStart(at));
+
+        if (rewards.length === 0)
+        {
+            await this._database.addRewards(userId, this.generateRewards(at));
+            rewards = await this._database.getWeeksRewards(userId, this.getWeekStart(at));
+        }
+
+        return rewards;
+
     };
 
 
@@ -69,7 +74,6 @@ export default class Rewards
 
     private generateRewards(at: string): Reward[]
     {
-        const dayInMilliseconds = 86400000;
         let targetDate: any = new Date(at);
         let day = targetDate.getDay();
         let elapsedDaysSinceSunday: number = dayInMilliseconds * day
@@ -106,6 +110,19 @@ export default class Rewards
 
         // Strip off a zero from the end 
         return rewards;
+    };
+
+
+
+    private getWeekStart(date: string): string
+    {
+        let targetDate: any = new Date(date);
+        let day = targetDate.getDay();
+        let elapsedDaysSinceSunday: number = dayInMilliseconds * day
+        let weekStartInMilliseconds: number = targetDate - elapsedDaysSinceSunday;
+        let weekStart = new Date(weekStartInMilliseconds);
+        weekStart.setHours(0, 0, 0); 
+        return weekStart.toISOString().split(".")[0] + "Z";
     };
 
     private validateUserId(userId: string): void
